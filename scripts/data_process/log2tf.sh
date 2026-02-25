@@ -13,14 +13,18 @@ SAVE_DIR="$PROJECT_DIR/work_dir/tf_logs"
 Prefix="random_ckpt"
 
 # 1. 解析 SFT (Supervised Fine-Tuning) 日志
-# python3 llmpractice/data_process/log2tf.py \
+# 示例：解析名为 sft.log 的文件
+# echo "Processing SFT Log..."
+# python3 $PROJECT_DIR/llmpractice/data_process/log2tf.py \
 #     --log-path "$LOG_PATH" \
 #     --save-log-dir "$SAVE_DIR/sft_$Prefix" \
 #     --stage sft \
 #     --tag-prefix "train/"
 
 # 2. 解析 DPO (Direct Preference Optimization) 日志
-# python3 llmpractice/data_process/log2tf.py \
+# 示例：解析名为 dpo.log 的文件
+# echo "Processing DPO Log..."
+# python3 $PROJECT_DIR/llmpractice/data_process/log2tf.py \
 #     --log-path "$LOG_PATH" \
 #     --save-log-dir "$SAVE_DIR/dpo_$Prefix" \
 #     --stage dpo \
