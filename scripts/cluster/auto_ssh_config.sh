@@ -74,14 +74,36 @@ done
 SSH_OPTS="-q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5"
 
 # 1. 检查并安装依赖
-if ! command -v sshpass &> /dev/null; then
+install_sshpass() {
     echo "📦 正在安装依赖 sshpass..."
-    if command -v yum &> /dev/null; then
-        sudo yum install -y sshpass
-    elif command -v apt-get &> /dev/null; then
-        sudo apt-get install -y sshpass
-    else
-        echo "❌ 无法检测到包管理器，请手动安装 sshpass"
+    if command -v apt-get &> /dev/null; then
+        sudo apt-get install -y sshpass && return 0
+    fi
+    # yum/dnf: 先尝试直接安装，失败则从源码编译
+    if command -v yum &> /dev/null || command -v dnf &> /dev/null; then
+        (command -v dnf &> /dev/null && sudo dnf install -y sshpass) || \
+        (command -v yum &> /dev/null && sudo yum install -y sshpass) && return 0
+        echo "📦 包管理器未找到 sshpass，尝试从源码编译..."
+        if command -v gcc &> /dev/null && command -v make &> /dev/null; then
+            local tmpdir=$(mktemp -d)
+            trap 'rm -rf "$tmpdir"' EXIT
+            curl -sL https://sourceforge.net/projects/sshpass/files/sshpass/1.10/sshpass-1.10.tar.gz/download -o "$tmpdir/sshpass.tar.gz" && \
+            tar -xzf "$tmpdir/sshpass.tar.gz" -C "$tmpdir" && \
+            cd "$tmpdir"/sshpass-*/ && \
+            ./configure --prefix=/usr/local && \
+            make && sudo make install && \
+            cd - > /dev/null && return 0
+            echo "❌ 从源码编译 sshpass 失败"
+        else
+            echo "❌ 需要 gcc 和 make 来编译 sshpass，请先安装: sudo yum install -y gcc make"
+        fi
+    fi
+    return 1
+}
+
+if ! command -v sshpass &> /dev/null; then
+    if ! install_sshpass; then
+        echo "❌ 无法安装 sshpass，请手动安装后重试"
         exit 1
     fi
 fi
