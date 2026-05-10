@@ -1,4 +1,4 @@
-# Post-Training-Dataset
+# Post-Training 数据集介绍
 
 ## nvidia/Nemotron-Post-Training-Dataset-v1
 
@@ -41,10 +41,9 @@
 You are a helpful and friendly AI assistant.
 ```
 
-需要注意的是，聊天分支中的某些提示来源于外部。对于这些条目，“messages”中的“input”字段为空，用户必须从原始来源 lmsys-chat-1m 下载所需数据。
+需要注意的是，聊天分支中的某些提示来源于外部。对于这些条目，"messages"中的"input"字段为空，用户必须从原始来源 lmsys-chat-1m 下载所需数据。
 
 #### For the code split:
-
 
 若要指导模型生成带有详细解释的代码，请使用同时要求解释和代码块的格式：
 
@@ -53,14 +52,14 @@ Write a solution for the following programming challenge. Provide a brief explan
 {problem}
 ```
 
-需要注意的是，代码分支中的某些提示来源于外部。对于这些条目，“input”字段为空，用户必须从原始来源网站下载所需数据。更多信息请参阅 OpenCodeReasoning-2 的 README 文档。
+需要注意的是，代码分支中的某些提示来源于外部。对于这些条目，"input"字段为空，用户必须从原始来源网站下载所需数据。更多信息请参阅 OpenCodeReasoning-2 的 README 文档。
 
 #### For the math split:
 
 若要引导模型提供分步解答并明确标注最终答案，请使用如下格式：
 
 ```text
-Solve the following math problem. Explain your reasoning and put the final answer in \\boxed{}.
+Solve the following math problem. Explain your reasoning and put the final answer in \boxed{}.
 {problem}
 ```
 
@@ -75,20 +74,15 @@ Read the following problem carefully and provide a detailed, step-by-step answer
 
 #### For the tool calling split:
 
-工具调用分割覆盖了单轮、多轮和多步骤工具调用场景。元数据中的“工具”和助手消息中的“tool_calls”应按照模型的工具调用模板进行格式化以用于训练。
-
-
-
-
+工具调用分割覆盖了单轮、多轮和多步骤工具调用场景。元数据中的"工具"和助手消息中的"tool_calls"应按照模型的工具调用模板进行格式化以用于训练。
 
 ## a-m-team/AM-DeepSeek-R1-0528-Distilled
 
 ### Dataset Summary
 
+该数据集是一个高质量推理语料库，**源自 DeepSeek-R1-0528 的蒸馏**，这是 DeepSeek-R1 大语言模型的改进版。相较于初始版本，DeepSeek-R1-0528 在推理能力、指令遵循和多轮对话方面展现出显著进步。基于这些改进，我们以 DeepSeek-R1-0528 作为教师模型，收集并精炼了跨多个领域的 **260 万条**多样化查询。
 
-该数据集是一个高质量推理语料库， **源自 DeepSeek-R1-0528 的蒸馏 ，这是 DeepSeek-R1 大语言模型的改进版。相较于初始版本，DeepSeek-R1-0528 在推理能力、指令遵循和多轮对话方面展现出显著进步。基于这些改进，我们以 DeepSeek-R1-0528 作为教师模型，收集并精炼了跨多个领域的 **260 万条多样化查询。
-
-DeepSeek-R1-0528 的一个显著特点是其输出长度远超先前版本，尤其在数学领域：对于某些数学问题，输出长度达到早期版本的 **1.5 至 2 倍。这体现了更详尽、明确的逐步推理过程。
+DeepSeek-R1-0528 的一个显著特点是其输出长度远超先前版本，尤其在数学领域：对于某些数学问题，输出长度达到早期版本的 **1.5 至 2 倍**。这体现了更详尽、明确的逐步推理过程。
 
 该数据集采用统一格式与验证流程，可直接与其他开源蒸馏语料库进行对比。其旨在支持开发具备强大、可验证推理能力的下一代语言模型。
 
@@ -110,22 +104,19 @@ DeepSeek-R1-0528 的一个显著特点是其输出长度远超先前版本，尤
 
 Each sample is a dictionary with the following fields:
 
-- system: The system prompt used during distillation, typically guiding structured reasoning via <think>and<answer>tags.
-  - Note: Some instance's 'system' fields in our dataset are empty. The 'system' field is not used in training. Feel free to use them.
-
-- conversations
-  : A list of dialogue turns structured as:
+- **system**: The system prompt used during distillation, typically guiding structured reasoning via `<think&gt;` and `<answer&gt;` tags.
+  - Note: Some instance's 'system' fields are empty. The 'system' field is not used in training.
+- **conversations**: A list of dialogue turns structured as:
   - `from`: Either `'human'` or `'assistant'`.
   - `value`: Full message content.
-  - info
-    : Metadata dictionary containing:
-    - `source`: Dataset origin (e.g., `OpenHermes-2.5`).
-    - `category`: Task domain (e.g., `math`, `code`, `general chat`).
-    - `ground_truth`: Ground truth reference (if applicable).
-    - `test_case`: Associated test case ID (optional).
-    - `instruction_constrain`: Instruction constraint metadata (optional).
-    - `think_content`: Assistant’s reasoning trace.
-    - `answer_content`: Final answer segment.
-    - `verify_score`: Verification confidence score (float ≥ 0.9).
-    - `model_name`: Name of the teacher model (`deepseek-r1-0528`).
-    - `ppl`: Perplexity of the assistant’s output.
+- **info**: Metadata dictionary containing:
+  - `source`: Dataset origin (e.g., `OpenHermes-2.5`).
+  - `category`: Task domain (e.g., `math`, `code`, `general chat`).
+  - `ground_truth`: Ground truth reference (if applicable).
+  - `test_case`: Associated test case ID (optional).
+  - `instruction_constrain`: Instruction constraint metadata (optional).
+  - `think_content`: Assistant's reasoning trace.
+  - `answer_content`: Final answer segment.
+  - `verify_score`: Verification confidence score (float >= 0.9).
+  - `model_name`: Name of the teacher model (`deepseek-r1-0528`).
+  - `ppl`: Perplexity of the assistant's output.
