@@ -223,6 +223,53 @@ export http_proxy=http://localhost:8082
 
 ---
 
+## 一键测试脚本（从本地执行）
+
+在本地机器上直接测试远程服务器的 SSH 连接、反向代理端口监听和代理可用性：
+
+```bash
+# 测试单台服务器（以 bms1889 为例）
+ssh <主机别名> "echo '=== 连接成功 ===' && \
+  (netstat -tlnp 2>/dev/null | grep 8080 || ss -tlnp | grep 8080) && \
+  curl -s --max-time 10 -x http://localhost:8080 https://www.google.com -o /dev/null -w '代理状态: HTTP %{http_code}\n'"
+```
+
+**批量测试多台服务器：**
+
+```bash
+#!/bin/bash
+# 文件名: test_ssh_proxy.sh
+# 用法: bash test_ssh_proxy.sh bms1889 bms1890 bms-ly-001
+
+for host in "$@"; do
+  echo "===== 测试 $host ====="
+  ssh -o ConnectTimeout=10 "$host" \
+    "echo '连接: 成功'; \
+     netstat -tlnp 2>/dev/null | grep -q 8080 && echo '端口 8080: 已监听' || echo '端口 8080: 未监听'; \
+     curl -s --max-time 10 -x http://localhost:8080 https://www.google.com -o /dev/null -w '代理访问: HTTP %{http_code}\n'" \
+    2>/dev/null
+  echo ""
+done
+```
+
+**预期输出示例：**
+
+```
+===== 测试 bms1889 =====
+连接: 成功
+端口 8080: 已监听
+代理访问: HTTP 302
+
+===== 测试 bms1890 =====
+连接: 成功
+端口 8080: 已监听
+代理访问: HTTP 302
+```
+
+> **说明：** Google 返回 `302` 表示代理正常工作（重定向到本地化站点）。如果返回 `000` 或超时，说明代理不通。
+
+---
+
 ## 相关命令速查
 
 | 命令 | 说明 |
